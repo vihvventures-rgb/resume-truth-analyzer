@@ -1631,7 +1631,24 @@ const loaderSteps = [
   "Building your Resume Truth Report…"
 ];
 
-function startAnalysis() {
+fetch("/api/analyze", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
+
+  body: JSON.stringify({
+    text: "My Resume Text"
+  })
+})
+.then(res => res.json())
+.then(data => {
+
+  console.log(data);
+
+  alert("AI Connected Successfully");
+
+}); {
   document.getElementById('dropZone').style.display = 'none';
   document.getElementById('loading').style.display = 'block';
   document.getElementById('loading').scrollIntoView({ behavior: 'smooth', block: 'center' });
