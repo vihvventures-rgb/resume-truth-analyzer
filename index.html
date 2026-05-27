@@ -1604,7 +1604,69 @@
     <button class="btn-primary" style="width:100%; margin-top:20px;" onclick="document.getElementById('sample-modal-overlay').classList.remove('active'); scrollToUpload();">⚡ Analyze My Resume Free</button>
   </div>
 </div>
+async function testResume(input) {
 
+  const file = input.files[0];
+
+  if (!file) {
+    alert("Upload PDF");
+    return;
+  }
+
+  const reader = new FileReader();
+
+  reader.onload = async function() {
+
+    const typedarray = new Uint8Array(this.result);
+
+    const pdf = await pdfjsLib.getDocument(typedarray).promise;
+
+    let text = "";
+
+    for (let i = 1; i <= pdf.numPages; i++) {
+
+      const page = await pdf.getPage(i);
+
+      const content = await page.getTextContent();
+
+      const strings = content.items.map(item => item.str);
+
+      text += strings.join(" ");
+
+    }
+
+    alert(text.substring(0, 1000));
+
+    const response = await fetch('/api/analyze', {
+
+      method: 'POST',
+
+      headers: {
+        'Content-Type': 'application/json'
+      },
+
+      body: JSON.stringify({
+        text: text
+      })
+
+    });
+
+    const data = await response.json();
+
+    document.body.innerHTML = `
+      <div style="padding:40px;background:#111;color:white;font-family:Arial;">
+        <h1>AI Resume Analysis</h1>
+        <pre style="white-space:pre-wrap;">
+${data.choices[0].message.content}
+        </pre>
+      </div>
+    `;
+
+  };
+
+  reader.readAsArrayBuffer(file);
+
+}
 <script>
   <script>
 async function startAnalysis() {
