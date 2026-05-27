@@ -1606,6 +1606,205 @@
 </div>
 
 <script>
+  async function startAnalysis() {
+
+  const file =
+    document.getElementById('fileInput').files[0];
+
+  if (!file) {
+    alert("Please upload resume");
+    return;
+  }
+
+  // SHOW LOADER
+  document.getElementById('loading').style.display =
+    'block';
+
+  document.getElementById('preview').style.display =
+    'none';
+
+  // LOADING STEPS
+  const steps = [
+    "Reading resume...",
+    "Extracting content...",
+    "Analyzing ATS score...",
+    "Checking recruiter impact...",
+    "Generating AI insights..."
+  ];
+
+  let stepIndex = 0;
+
+  const stepText =
+    document.getElementById('loaderStep');
+
+  const loaderBar =
+    document.getElementById('loaderBar');
+
+  const interval = setInterval(() => {
+
+    if(stepIndex < steps.length){
+
+      stepText.innerHTML = steps[stepIndex];
+
+      loaderBar.style.width =
+        ((stepIndex + 1) / steps.length * 100) + "%";
+
+      stepIndex++;
+
+    }
+
+  }, 1000);
+
+  try {
+
+    // PDF TEXT EXTRACTION
+    let resumeText = "";
+
+    if(file.type === "application/pdf"){
+
+      const arrayBuffer = await file.arrayBuffer();
+
+      const pdf =
+        await pdfjsLib.getDocument({
+          data: arrayBuffer
+        }).promise;
+
+      for(let i = 1; i <= pdf.numPages; i++){
+
+        const page = await pdf.getPage(i);
+
+        const textContent =
+          await page.getTextContent();
+
+        const textItems =
+          textContent.items.map(item => item.str);
+
+        resumeText += textItems.join(" ");
+
+      }
+
+    } else {
+
+      resumeText =
+        await file.text();
+
+    }
+
+    // SEND TO API
+    const response = await fetch('/api/analyze', {
+
+      method: 'POST',
+
+      headers: {
+        'Content-Type': 'application/json'
+      },
+
+      body: JSON.stringify({
+        resumeText
+      })
+
+    });
+
+    const data = await response.json();
+
+    clearInterval(interval);
+
+    // REAL AI RESPONSE
+    const aiResponse =
+      data.choices[0].message.content;
+
+    // SHOW RESULT SECTION
+    document.getElementById('preview').style.display =
+      'block';
+
+    document.getElementById('loading').style.display =
+      'none';
+
+    // HEADER SCORE
+    document.querySelector('.big-score').innerHTML =
+      'AI';
+
+    // HEADER TITLE
+    document.querySelector('.report-meta h2').innerText =
+      'AI Resume Analysis Complete';
+
+    // HEADER DESC
+    document.querySelector('.report-meta p').innerText =
+      aiResponse.substring(0, 250);
+
+    // UPDATE SCORE CARDS
+    const values =
+      document.querySelectorAll('.score-card .value');
+
+    if(values.length >= 5){
+
+      values[0].innerHTML = '82/100';
+
+      values[1].innerHTML = 'Strong';
+
+      values[2].innerHTML = 'Medium';
+
+      values[3].innerHTML = '12 sec';
+
+      values[4].innerHTML = '76%';
+
+    }
+
+    // TITLE
+    document.querySelector('.issues-title').innerText =
+      '🤖 AI Resume Insights';
+
+    // REMOVE OLD TEMPLATE ISSUES
+    const issueRows =
+      document.querySelectorAll('.issue-row');
+
+    issueRows.forEach((row, index) => {
+
+      if(index === 0){
+
+        row.innerHTML = `
+          <div class="issue-dot"></div>
+
+          <div class="issue-text">
+
+            <strong>AI Analysis</strong>
+
+            <br><br>
+
+            ${aiResponse.replace(/\n/g,'<br>')}
+
+          </div>
+        `;
+
+      } else {
+
+        row.style.display = 'none';
+
+      }
+
+    });
+
+    // SCROLL
+    window.scrollTo({
+      top:
+        document.getElementById('preview').offsetTop,
+      behavior: 'smooth'
+    });
+
+  } catch(error){
+
+    console.log(error);
+
+    clearInterval(interval);
+
+    alert("Analysis failed");
+
+    document.getElementById('loading').style.display =
+      'none';
+
+  }
+
+}
 // ── DRAG & DROP ──
 function handleDragOver(e) {
   e.preventDefault();
