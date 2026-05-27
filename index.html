@@ -1607,7 +1607,49 @@
 
 <script>
   <script>
+async function startAnalysis() {
 
+  const file = document.getElementById('fileInput').files[0];
+
+  if (!file) {
+    alert("Please upload file");
+    return;
+  }
+
+  document.getElementById('loading').style.display = 'block';
+
+  const formData = new FormData();
+  formData.append("resume", file);
+
+  try {
+
+    const response = await fetch('/api/analyze', {
+      method: 'POST',
+      body: formData
+    });
+
+    const data = await response.json();
+
+    console.log(data);
+
+    document.getElementById('loading').style.display = 'none';
+
+    document.getElementById('preview').style.display = 'block';
+
+    window.scrollTo({
+      top: document.getElementById('preview').offsetTop,
+      behavior: 'smooth'
+    });
+
+  } catch (error) {
+
+    console.log(error);
+
+    alert("Analysis failed");
+
+  }
+
+}
 // — DRAG & DROP —
 // ── DRAG & DROP ──
 function handleDragOver(e) {
