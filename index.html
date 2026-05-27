@@ -1631,7 +1631,11 @@ async function startAnalysis() {
     const data = await response.json();
 
     console.log(data);
+const aiText = data.choices[0].message.content;
 
+document.querySelector('.big-score').innerHTML = 'AI';
+
+document.querySelector('.report-meta p').innerText = aiText;
     document.getElementById('loading').style.display = 'none';
 
     document.getElementById('preview').style.display = 'block';
