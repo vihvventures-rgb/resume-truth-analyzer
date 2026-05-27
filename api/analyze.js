@@ -1,30 +1,52 @@
 export default async function handler(req, res) {
 
-  const response = await fetch(
-    "https://openrouter.ai/api/v1/chat/completions",
-    {
-      method: "POST",
+  try {
 
-    headers: {
-  "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
-  "Content-Type": "application/json"
-},
+    const response = await fetch(
+      "https://openrouter.ai/api/v1/chat/completions",
+      {
+        method: "POST",
 
-      body: JSON.stringify({
-        model: "deepseek/deepseek-chat",
+        headers: {
+          "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
+          "Content-Type": "application/json"
+        },
 
-        messages: [
-          {
-            role: "user",
-            content: "Analyze Resume"
-          }
-        ]
-      })
-    }
-  );
+        body: JSON.stringify({
+          model: "deepseek/deepseek-chat",
 
-  const data = await response.json();
+          messages: [
+            {
+              role: "user",
+              content: `
+Analyze this resume and give:
 
-  res.status(200).json(data);
+1. ATS Score out of 100
+2. Top strengths
+3. Weaknesses
+4. Missing keywords
+5. Suggested improvements
+
+Resume:
+
+${req.body.text}
+              `
+            }
+          ]
+        })
+      }
+    );
+
+    const data = await response.json();
+
+    res.status(200).json(data);
+
+  } catch (error) {
+
+    res.status(500).json({
+      error: error.message
+    });
+
+  }
 
 }
