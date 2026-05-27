@@ -1629,6 +1629,7 @@ async function startAnalysis() {
     });
 
     const data = await response.json();
+    alert(data.choices[0].message.content);
 
     console.log(data);
     const aiResponse = data.choices[0].message.content;
