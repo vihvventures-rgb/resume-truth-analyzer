@@ -1606,6 +1606,66 @@
 </div>
 
 <script>
+  <script>
+
+async function startAnalysis() {
+
+  const file = document.getElementById('fileInput').files[0];
+
+  if (!file) {
+    alert("Please upload resume");
+    return;
+  }
+
+  const reader = new FileReader();
+
+  reader.onload = async function () {
+
+    const typedarray = new Uint8Array(this.result);
+
+    const pdf = await pdfjsLib.getDocument(typedarray).promise;
+
+    let text = "";
+
+    for (let i = 1; i <= pdf.numPages; i++) {
+
+      const page = await pdf.getPage(i);
+
+      const content = await page.getTextContent();
+
+      const strings = content.items.map(item => item.str);
+
+      text += strings.join(" ");
+
+    }
+
+    const response = await fetch("/api/analyze", {
+
+      method: "POST",
+
+      headers: {
+        "Content-Type": "application/json"
+      },
+
+      body: JSON.stringify({
+        text: text
+      })
+
+    });
+
+    const data = await response.json();
+
+    console.log(data);
+
+    alert("Resume analyzed successfully");
+
+  };
+
+  reader.readAsArrayBuffer(file);
+
+}
+
+// — DRAG & DROP —
 // ── DRAG & DROP ──
 function handleDragOver(e) {
   e.preventDefault();
