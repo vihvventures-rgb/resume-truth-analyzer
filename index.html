@@ -1638,8 +1638,16 @@ document.getElementById('aiResult').innerHTML = 'Done';
 document.getElementById('aiText').innerText = aiResponse;
     document.getElementById('loading').style.display = 'none';
 
-    document.getElementById('preview').style.display = 'block';
+document.getElementById('preview').innerHTML = `
+  <div style="padding:20px;color:white;">
+    <h2>AI Resume Analysis</h2>
+    <pre style="white-space:pre-wrap;font-size:14px;">
+${aiResponse}
+    </pre>
+  </div>
+`;
 
+document.getElementById('preview').style.display = 'block';
     window.scrollTo({
       top: document.getElementById('preview').offsetTop,
       behavior: 'smooth'
