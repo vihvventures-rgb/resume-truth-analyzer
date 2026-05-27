@@ -29,7 +29,7 @@ Analyze this resume and give:
 
 Resume:
 
-${req.body.text}
+${JSON.stringify(req.body)}
               `
             }
           ]
