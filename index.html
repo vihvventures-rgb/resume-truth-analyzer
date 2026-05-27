@@ -1148,11 +1148,11 @@
 
     <div class="report-header">
       <div>
-        <div class="big-score">42<sub>/100</sub></div>
+        <div class="big-score" id="aiResult">Analyzing...</div>
       </div>
       <div class="report-meta">
         <h2>Resume Truth Score: Critical</h2>
-        <p>Your resume has significant issues that are likely causing recruiters and ATS systems to skip it. Here's what we found.</p>
+      <p id="aiText">AI analysis will appear here...</p>
       </div>
       <div style="display:flex; align-items:center; gap:8px; padding:10px 18px; background:rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.2); border-radius:10px;">
         <span style="font-size:1.4rem;">🚨</span>
@@ -1631,6 +1631,11 @@ async function startAnalysis() {
     const data = await response.json();
 
     console.log(data);
+    const aiResponse = data.choices[0].message.content;
+
+document.getElementById('aiResult').innerHTML = 'Done';
+
+document.getElementById('aiText').innerText = aiResponse;
 const aiText = data.choices[0].message.content;
 
 document.querySelector('.big-score').innerHTML = 'AI';
