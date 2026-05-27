@@ -1636,11 +1636,6 @@ async function startAnalysis() {
 document.getElementById('aiResult').innerHTML = 'Done';
 
 document.getElementById('aiText').innerText = aiResponse;
-const aiText = data.choices[0].message.content;
-
-document.querySelector('.big-score').innerHTML = 'AI';
-
-document.querySelector('.report-meta p').innerText = aiText;
     document.getElementById('loading').style.display = 'none';
 
     document.getElementById('preview').style.display = 'block';
