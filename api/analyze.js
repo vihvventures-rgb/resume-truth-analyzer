@@ -6,7 +6,7 @@ export default async function handler(req, res) {
       method: "POST",
 
       headers: {
-        "Authorization": "Bearer YOUR_API_KEY",
+        "Authorization": "Bearer `Bearer ${process.env.OPENROUTER_API_KEY}`
         "Content-Type": "application/json"
       },
 
